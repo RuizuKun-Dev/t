@@ -1,1249 +1,685 @@
--- t: a runtime typechecker for Roblox
-
 local t = {}
 
 function t.type(typeName)
-	return function(value)
-		local valueType = type(value)
-		if valueType == typeName then
-			return true
-		else
-			return false
-		end
-	end
-end
+    return function(value)
+        local valueType = type(value)
 
+        if valueType == typeName then
+            return true
+        else
+            return false
+        end
+    end
+end
 function t.typeof(typeName)
-	return function(value)
-		local valueType = typeof(value)
-		if valueType == typeName then
-			return true
-		else
-			return false
-		end
-	end
+    return function(value)
+        local valueType = typeof(value)
+
+        if valueType == typeName then
+            return true
+        else
+            return false
+        end
+    end
 end
-
---[[**
-	matches any type except nil
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.any(value)
-	if value ~= nil then
-		return true
-	else
-		return false
-	end
+    if value ~= nil then
+        return true
+    else
+        return false
+    end
 end
 
---Lua primitives
+t.boolean = t.typeof('boolean')
+t.thread = t.typeof('thread')
+t.callback = t.typeof('function')
+t['function'] = t.callback
+t.none = t.typeof('nil')
+t['nil'] = t.none
+t.string = t.typeof('string')
+t.table = t.typeof('table')
+t.userdata = t.type('userdata')
 
---[[**
-	ensures Lua primitive boolean type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.boolean = t.typeof("boolean")
-
---[[**
-	ensures Lua primitive thread type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.thread = t.typeof("thread")
-
---[[**
-	ensures Lua primitive callback type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.callback = t.typeof("function")
-t["function"] = t.callback
-
---[[**
-	ensures Lua primitive none type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.none = t.typeof("nil")
-t["nil"] = t.none
-
---[[**
-	ensures Lua primitive string type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.string = t.typeof("string")
-
---[[**
-	ensures Lua primitive table type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.table = t.typeof("table")
-
---[[**
-	ensures Lua primitive userdata type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.userdata = t.type("userdata")
-
---[[**
-	ensures value is a number and non-NaN
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.number(value)
-	local valueType = typeof(value)
-	if valueType == "number" then
-		if value == value then
-			return true
-		else
-			return false
-		end
-	else
-		return false
-	end
+    local valueType = typeof(value)
+
+    if valueType == 'number' then
+        if value == value then
+            return true
+        else
+            return false
+        end
+    else
+        return false
+    end
 end
-
---[[**
-	ensures value is NaN
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.nan(value)
-	local valueType = typeof(value)
-	if valueType == "number" then
-		if value ~= value then
-			return true
-		else
-			return false
-		end
-	else
-		return false
-	end
+    local valueType = typeof(value)
+
+    if valueType == 'number' then
+        if value ~= value then
+            return true
+        else
+            return false
+        end
+    else
+        return false
+    end
 end
 
--- roblox types
+t.Axes = t.typeof('Axes')
+t.BrickColor = t.typeof('BrickColor')
+t.CatalogSearchParams = t.typeof('CatalogSearchParams')
+t.CFrame = t.typeof('CFrame')
+t.Color3 = t.typeof('Color3')
+t.ColorSequence = t.typeof('ColorSequence')
+t.ColorSequenceKeypoint = t.typeof('ColorSequenceKeypoint')
+t.DateTime = t.typeof('DateTime')
+t.DockWidgetPluginGuiInfo = t.typeof('DockWidgetPluginGuiInfo')
+t.Enum = t.typeof('Enum')
+t.EnumItem = t.typeof('EnumItem')
+t.Enums = t.typeof('Enums')
+t.Faces = t.typeof('Faces')
+t.Instance = t.typeof('Instance')
+t.NumberRange = t.typeof('NumberRange')
+t.NumberSequence = t.typeof('NumberSequence')
+t.NumberSequenceKeypoint = t.typeof('NumberSequenceKeypoint')
+t.PathWaypoint = t.typeof('PathWaypoint')
+t.PhysicalProperties = t.typeof('PhysicalProperties')
+t.Random = t.typeof('Random')
+t.Ray = t.typeof('Ray')
+t.RaycastParams = t.typeof('RaycastParams')
+t.RaycastResult = t.typeof('RaycastResult')
+t.RBXScriptConnection = t.typeof('RBXScriptConnection')
+t.RBXScriptSignal = t.typeof('RBXScriptSignal')
+t.Rect = t.typeof('Rect')
+t.Region3 = t.typeof('Region3')
+t.Region3int16 = t.typeof('Region3int16')
+t.TweenInfo = t.typeof('TweenInfo')
+t.UDim = t.typeof('UDim')
+t.UDim2 = t.typeof('UDim2')
+t.Vector2 = t.typeof('Vector2')
+t.Vector2int16 = t.typeof('Vector2int16')
+t.Vector3 = t.typeof('Vector3')
+t.Vector3int16 = t.typeof('Vector3int16')
 
---[[**
-	ensures Roblox Axes type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Axes = t.typeof("Axes")
-
---[[**
-	ensures Roblox BrickColor type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.BrickColor = t.typeof("BrickColor")
-
---[[**
-	ensures Roblox CatalogSearchParams type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.CatalogSearchParams = t.typeof("CatalogSearchParams")
-
---[[**
-	ensures Roblox CFrame type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.CFrame = t.typeof("CFrame")
-
---[[**
-	ensures Roblox Color3 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Color3 = t.typeof("Color3")
-
---[[**
-	ensures Roblox ColorSequence type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.ColorSequence = t.typeof("ColorSequence")
-
---[[**
-	ensures Roblox ColorSequenceKeypoint type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.ColorSequenceKeypoint = t.typeof("ColorSequenceKeypoint")
-
---[[**
-	ensures Roblox DateTime type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.DateTime = t.typeof("DateTime")
-
---[[**
-	ensures Roblox DockWidgetPluginGuiInfo type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.DockWidgetPluginGuiInfo = t.typeof("DockWidgetPluginGuiInfo")
-
---[[**
-	ensures Roblox Enum type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Enum = t.typeof("Enum")
-
---[[**
-	ensures Roblox EnumItem type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.EnumItem = t.typeof("EnumItem")
-
---[[**
-	ensures Roblox Enums type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Enums = t.typeof("Enums")
-
---[[**
-	ensures Roblox Faces type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Faces = t.typeof("Faces")
-
---[[**
-	ensures Roblox Instance type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Instance = t.typeof("Instance")
-
---[[**
-	ensures Roblox NumberRange type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.NumberRange = t.typeof("NumberRange")
-
---[[**
-	ensures Roblox NumberSequence type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.NumberSequence = t.typeof("NumberSequence")
-
---[[**
-	ensures Roblox NumberSequenceKeypoint type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.NumberSequenceKeypoint = t.typeof("NumberSequenceKeypoint")
-
---[[**
-	ensures Roblox PathWaypoint type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.PathWaypoint = t.typeof("PathWaypoint")
-
---[[**
-	ensures Roblox PhysicalProperties type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.PhysicalProperties = t.typeof("PhysicalProperties")
-
---[[**
-	ensures Roblox Random type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Random = t.typeof("Random")
-
---[[**
-	ensures Roblox Ray type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Ray = t.typeof("Ray")
-
---[[**
-	ensures Roblox RaycastParams type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.RaycastParams = t.typeof("RaycastParams")
-
---[[**
-	ensures Roblox RaycastResult type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.RaycastResult = t.typeof("RaycastResult")
-
---[[**
-	ensures Roblox RBXScriptConnection type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.RBXScriptConnection = t.typeof("RBXScriptConnection")
-
---[[**
-	ensures Roblox RBXScriptSignal type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.RBXScriptSignal = t.typeof("RBXScriptSignal")
-
---[[**
-	ensures Roblox Rect type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Rect = t.typeof("Rect")
-
---[[**
-	ensures Roblox Region3 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Region3 = t.typeof("Region3")
-
---[[**
-	ensures Roblox Region3int16 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Region3int16 = t.typeof("Region3int16")
-
---[[**
-	ensures Roblox TweenInfo type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.TweenInfo = t.typeof("TweenInfo")
-
---[[**
-	ensures Roblox UDim type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.UDim = t.typeof("UDim")
-
---[[**
-	ensures Roblox UDim2 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.UDim2 = t.typeof("UDim2")
-
---[[**
-	ensures Roblox Vector2 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Vector2 = t.typeof("Vector2")
-
---[[**
-	ensures Roblox Vector2int16 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Vector2int16 = t.typeof("Vector2int16")
-
---[[**
-	ensures Roblox Vector3 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Vector3 = t.typeof("Vector3")
-
---[[**
-	ensures Roblox Vector3int16 type
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
-t.Vector3int16 = t.typeof("Vector3int16")
-
---[[**
-	ensures value is a given literal value
-
-	@param literal The literal to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.literal(...)
-	local size = select("#", ...)
-	if size == 1 then
-		local literal = ...
-		return function(value)
-			if value ~= literal then
-				return false
-			end
+    local size = select('#', ...)
 
-			return true
-		end
-	else
-		local literals = {}
-		for i = 1, size do
-			local value = select(i, ...)
-			literals[i] = t.literal(value)
-		end
+    if size == 1 then
+        local literal = ...
 
-		return t.union(table.unpack(literals, 1, size))
-	end
+        return function(value)
+            if value ~= literal then
+                return false
+            end
+
+            return true
+        end
+    else
+        local literals = {}
+
+        for i=1, size do
+            local value = select(i, ...)
+
+            literals[i] = t.literal(value)
+        end
+
+        return t.union(table.unpack(literals, 1, size))
+    end
 end
 
---[[**
-	DEPRECATED
-	Please use t.literal
-**--]]
 t.exactly = t.literal
 
---[[**
-	Returns a t.union of each key in the table as a t.literal
-
-	@param keyTable The table to get keys from
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.keyOf(keyTable)
-	local keys = {}
-	local length = 0
-	for key in pairs(keyTable) do
-		length = length + 1
-		keys[length] = key
-	end
+    local keys = {}
+    local length = 0
 
-	return t.literal(table.unpack(keys, 1, length))
+    for key in pairs(keyTable)do
+        length = length + 1
+        keys[length] = key
+    end
+
+    return t.literal(table.unpack(keys, 1, length))
 end
-
---[[**
-	Returns a t.union of each value in the table as a t.literal
-
-	@param valueTable The table to get values from
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.valueOf(valueTable)
-	local values = {}
-	local length = 0
-	for _, value in pairs(valueTable) do
-		length = length + 1
-		values[length] = value
-	end
+    local values = {}
+    local length = 0
 
-	return t.literal(table.unpack(values, 1, length))
+    for _, value in pairs(valueTable)do
+        length = length + 1
+        values[length] = value
+    end
+
+    return t.literal(table.unpack(values, 1, length))
 end
-
---[[**
-	ensures value is an integer
-
-	@param value The value to check against
-
-	@returns True iff the condition is satisfied, false otherwise
-**--]]
 function t.integer(value)
-	local success = t.number(value)
-	if not success then
-		return false
-	end
+    local success = t.number(value)
 
-	if value % 1 == 0 then
-		return true
-	else
-		return false
-	end
+    if not success then
+        return false
+    end
+    if value % 1 == 0 then
+        return true
+    else
+        return false
+    end
 end
-
---[[**
-	ensures value is a number where min <= value
-
-	@param min The minimum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberMin(min)
-	return function(value)
-		local success = t.number(value)
-		if not success then
-			return false
-		end
+    return function(value)
+        local success = t.number(value)
 
-		if value >= min then
-			return true
-		else
-			return false
-		end
-	end
+        if not success then
+            return false
+        end
+        if value >= min then
+            return true
+        else
+            return false
+        end
+    end
 end
-
---[[**
-	ensures value is a number where value <= max
-
-	@param max The maximum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberMax(max)
-	return function(value)
-		local success = t.number(value)
-		if not success then
-			return false
-		end
+    return function(value)
+        local success = t.number(value)
 
-		if value <= max then
-			return true
-		else
-			return false
-		end
-	end
+        if not success then
+            return false
+        end
+        if value <= max then
+            return true
+        else
+            return false
+        end
+    end
 end
-
---[[**
-	ensures value is a number where min < value
-
-	@param min The minimum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberMinExclusive(min)
-	return function(value)
-		local success = t.number(value)
-		if not success then
-			return false
-		end
+    return function(value)
+        local success = t.number(value)
 
-		if min < value then
-			return true
-		else
-			return false
-		end
-	end
+        if not success then
+            return false
+        end
+        if min < value then
+            return true
+        else
+            return false
+        end
+    end
 end
-
---[[**
-	ensures value is a number where value < max
-
-	@param max The maximum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberMaxExclusive(max)
-	return function(value)
-		local success = t.number(value)
-		if not success then
-			return false
-		end
+    return function(value)
+        local success = t.number(value)
 
-		if value < max then
-			return true
-		else
-			return false
-		end
-	end
+        if not success then
+            return false
+        end
+        if value < max then
+            return true
+        else
+            return false
+        end
+    end
 end
 
---[[**
-	ensures value is a number where value > 0
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 t.numberPositive = t.numberMinExclusive(0)
-
---[[**
-	ensures value is a number where value < 0
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 t.numberNegative = t.numberMaxExclusive(0)
 
---[[**
-	ensures value is a number where min <= value <= max
-
-	@param min The minimum to use
-	@param max The maximum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberConstrained(min, max)
-	assert(t.number(min))
-	assert(t.number(max))
-	local minCheck = t.numberMin(min)
-	local maxCheck = t.numberMax(max)
+    assert(t.number(min))
+    assert(t.number(max))
 
-	return function(value)
-		local minSuccess = minCheck(value)
-		if not minSuccess then
-			return false
-		end
+    local minCheck = t.numberMin(min)
+    local maxCheck = t.numberMax(max)
 
-		local maxSuccess = maxCheck(value)
-		if not maxSuccess then
-			return false
-		end
+    return function(value)
+        local minSuccess = minCheck(value)
 
-		return true
-	end
+        if not minSuccess then
+            return false
+        end
+
+        local maxSuccess = maxCheck(value)
+
+        if not maxSuccess then
+            return false
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value is a number where min < value < max
-
-	@param min The minimum to use
-	@param max The maximum to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.numberConstrainedExclusive(min, max)
-	assert(t.number(min))
-	assert(t.number(max))
-	local minCheck = t.numberMinExclusive(min)
-	local maxCheck = t.numberMaxExclusive(max)
+    assert(t.number(min))
+    assert(t.number(max))
 
-	return function(value)
-		local minSuccess = minCheck(value)
-		if not minSuccess then
-			return false
-		end
+    local minCheck = t.numberMinExclusive(min)
+    local maxCheck = t.numberMaxExclusive(max)
 
-		local maxSuccess = maxCheck(value)
-		if not maxSuccess then
-			return false
-		end
+    return function(value)
+        local minSuccess = minCheck(value)
 
-		return true
-	end
+        if not minSuccess then
+            return false
+        end
+
+        local maxSuccess = maxCheck(value)
+
+        if not maxSuccess then
+            return false
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value matches string pattern
-
-	@param string pattern to check against
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.match(pattern)
-	assert(t.string(pattern))
-	return function(value)
-		local stringSuccess = t.string(value)
-		if not stringSuccess then
-			return false
-		end
+    assert(t.string(pattern))
 
-		if string.match(value, pattern) == nil then
-			return false
-		end
+    return function(value)
+        local stringSuccess = t.string(value)
 
-		return true
-	end
+        if not stringSuccess then
+            return false
+        end
+        if string.match(value, pattern) == nil then
+            return false
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value is either nil or passes check
-
-	@param check The check to use
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.optional(check)
-	assert(t.callback(check))
-	return function(value)
-		if value == nil then
-			return true
-		end
+    assert(t.callback(check))
 
-		local success = check(value)
-		if success then
-			return true
-		else
-			return false
-		end
-	end
+    return function(value)
+        if value == nil then
+            return true
+        end
+
+        local success = check(value)
+
+        if success then
+            return true
+        else
+            return false
+        end
+    end
 end
-
---[[**
-	matches given tuple against tuple type definition
-
-	@param ... The type definition for the tuples
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.tuple(...)
-	local checks = { ... }
-	return function(...)
-		local args = { ... }
-		for i, check in ipairs(checks) do
-			local success = check(args[i])
-			if success == false then
-				return false
-			end
-		end
+    local checks = {...}
 
-		return true
-	end
+    return function(...)
+        local args = {...}
+
+        for i, check in ipairs(checks)do
+            local success = check(args[i])
+
+            if success == false then
+                return false
+            end
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures all keys in given table pass check
-
-	@param check The function to use to check the keys
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.keys(check)
-	assert(t.callback(check))
-	return function(value)
-		local tableSuccess = t.table(value)
-		if tableSuccess == false then
-			return false
-		end
+    assert(t.callback(check))
 
-		for key in pairs(value) do
-			local success = check(key)
-			if success == false then
-				return false
-			end
-		end
+    return function(value)
+        local tableSuccess = t.table(value)
 
-		return true
-	end
+        if tableSuccess == false then
+            return false
+        end
+
+        for key in pairs(value)do
+            local success = check(key)
+
+            if success == false then
+                return false
+            end
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures all values in given table pass check
-
-	@param check The function to use to check the values
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.values(check)
-	assert(t.callback(check))
-	return function(value)
-		local tableSuccess = t.table(value)
-		if tableSuccess == false then
-			return false
-		end
+    assert(t.callback(check))
 
-		for _, val in pairs(value) do
-			local success = check(val)
-			if success == false then
-				return false
-			end
-		end
+    return function(value)
+        local tableSuccess = t.table(value)
 
-		return true
-	end
+        if tableSuccess == false then
+            return false
+        end
+
+        for _, val in pairs(value)do
+            local success = check(val)
+
+            if success == false then
+                return false
+            end
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value is a table and all keys pass keyCheck and all values pass valueCheck
-
-	@param keyCheck The function to use to check the keys
-	@param valueCheck The function to use to check the values
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.map(keyCheck, valueCheck)
-	assert(t.callback(keyCheck))
-	assert(t.callback(valueCheck))
-	local keyChecker = t.keys(keyCheck)
-	local valueChecker = t.values(valueCheck)
+    assert(t.callback(keyCheck))
+    assert(t.callback(valueCheck))
 
-	return function(value)
-		local keySuccess = keyChecker(value)
-		if not keySuccess then
-			return false
-		end
+    local keyChecker = t.keys(keyCheck)
+    local valueChecker = t.values(valueCheck)
 
-		local valueSuccess = valueChecker(value)
-		if not valueSuccess then
-			return false
-		end
+    return function(value)
+        local keySuccess = keyChecker(value)
 
-		return true
-	end
+        if not keySuccess then
+            return false
+        end
+
+        local valueSuccess = valueChecker(value)
+
+        if not valueSuccess then
+            return false
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value is a table and all keys pass valueCheck and all values are true
-
-	@param valueCheck The function to use to check the values
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.set(valueCheck)
-	return t.map(valueCheck, t.literal(true))
+    return t.map(valueCheck, t.literal(true))
 end
 
 do
-	local arrayKeysCheck = t.keys(t.integer)
---[[**
-		ensures value is an array and all values of the array match check
+    local arrayKeysCheck = t.keys(t.integer)
 
-		@param check The check to compare all values with
+    function t.array(check)
+        assert(t.callback(check))
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.array(check)
-		assert(t.callback(check))
-		local valuesCheck = t.values(check)
+        local valuesCheck = t.values(check)
 
-		return function(value)
-			local keySuccess = arrayKeysCheck(value)
-			if keySuccess == false then
-				return false
-			end
+        return function(value)
+            local keySuccess = arrayKeysCheck(value)
 
-			-- # is unreliable for sparse arrays
-			-- Count upwards using ipairs to avoid false positives from the behavior of #
-			local arraySize = 0
+            if keySuccess == false then
+                return false
+            end
 
-			for _ in ipairs(value) do
-				arraySize = arraySize + 1
-			end
+            local arraySize = 0
 
-			for key in pairs(value) do
-				if key < 1 or key > arraySize then
-					return false
-				end
-			end
+            for _ in ipairs(value)do
+                arraySize = arraySize + 1
+            end
+            for key in pairs(value)do
+                if key < 1 or key > arraySize then
+                    return false
+                end
+            end
 
-			local valueSuccess = valuesCheck(value)
-			if not valueSuccess then
-				return false
-			end
+            local valueSuccess = valuesCheck(value)
 
-			return true
-		end
-	end
+            if not valueSuccess then
+                return false
+            end
 
---[[**
-		ensures value is an array of a strict makeup and size
+            return true
+        end
+    end
+    function t.strictArray(...)
+        local valueTypes = {...}
 
-		@param check The check to compare all values with
+        assert(t.array(t.callback)(valueTypes))
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.strictArray(...)
-		local valueTypes = { ... }
-		assert(t.array(t.callback)(valueTypes))
+        return function(value)
+            local keySuccess = arrayKeysCheck(value)
 
-		return function(value)
-			local keySuccess = arrayKeysCheck(value)
-			if keySuccess == false then
-				return false
-			end
+            if keySuccess == false then
+                return false
+            end
+            if #valueTypes < #value then
+                return false
+            end
 
-			-- If there's more than the set array size, disallow
-			if #valueTypes < #value then
-				return false
-			end
+            for idx, typeFn in pairs(valueTypes)do
+                local typeSuccess = typeFn(value[idx])
 
-			for idx, typeFn in pairs(valueTypes) do
-				local typeSuccess = typeFn(value[idx])
-				if not typeSuccess then
-					return false
-				end
-			end
+                if not typeSuccess then
+                    return false
+                end
+            end
 
-			return true
-		end
-	end
+            return true
+        end
+    end
 end
-
 do
-	local callbackArray = t.array(t.callback)
---[[**
-		creates a union type
+    local callbackArray = t.array(t.callback)
 
-		@param ... The checks to union
+    function t.union(...)
+        local checks = {...}
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.union(...)
-		local checks = { ... }
-		assert(callbackArray(checks))
+        assert(callbackArray(checks))
 
-		return function(value)
-			for _, check in ipairs(checks) do
-				if check(value) then
-					return true
-				end
-			end
+        return function(value)
+            for _, check in ipairs(checks)do
+                if check(value) then
+                    return true
+                end
+            end
 
-			return false
-		end
-	end
+            return false
+        end
+    end
 
---[[**
-		Alias for t.union
-	**--]]
-	t.some = t.union
+    t.some = t.union
 
---[[**
-		creates an intersection type
+    function t.intersection(...)
+        local checks = {...}
 
-		@param ... The checks to intersect
+        assert(callbackArray(checks))
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.intersection(...)
-		local checks = { ... }
-		assert(callbackArray(checks))
+        return function(value)
+            for _, check in ipairs(checks)do
+                local success = check(value)
 
-		return function(value)
-			for _, check in ipairs(checks) do
-				local success = check(value)
-				if not success then
-					return false
-				end
-			end
+                if not success then
+                    return false
+                end
+            end
 
-			return true
-		end
-	end
+            return true
+        end
+    end
 
---[[**
-		Alias for t.intersection
-	**--]]
-	t.every = t.intersection
+    t.every = t.intersection
 end
-
 do
-	local checkInterface = t.map(t.any, t.callback)
---[[**
-		ensures value matches given interface definition
+    local checkInterface = t.map(t.any, t.callback)
 
-		@param checkTable The interface definition
+    function t.interface(checkTable)
+        assert(checkInterface(checkTable))
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.interface(checkTable)
-		assert(checkInterface(checkTable))
-		return function(value)
-			local tableSuccess = t.table(value)
-			if tableSuccess == false then
-				return false
-			end
+        return function(value)
+            local tableSuccess = t.table(value)
 
-			for key, check in pairs(checkTable) do
-				local success = check(value[key])
-				if success == false then
-					return false
-				end
-			end
+            if tableSuccess == false then
+                return false
+            end
 
-			return true
-		end
-	end
+            for key, check in pairs(checkTable)do
+                local success = check(value[key])
 
---[[**
-		ensures value matches given interface definition strictly
+                if success == false then
+                    return false
+                end
+            end
 
-		@param checkTable The interface definition
+            return true
+        end
+    end
+    function t.strictInterface(checkTable)
+        assert(checkInterface(checkTable))
 
-		@returns A function that will return true iff the condition is passed
-	**--]]
-	function t.strictInterface(checkTable)
-		assert(checkInterface(checkTable))
-		return function(value)
-			local tableSuccess = t.table(value)
-			if tableSuccess == false then
-				return false
-			end
+        return function(value)
+            local tableSuccess = t.table(value)
 
-			for key, check in pairs(checkTable) do
-				local success = check(value[key])
-				if success == false then
-					return false
-				end
-			end
+            if tableSuccess == false then
+                return false
+            end
 
-			for key in pairs(value) do
-				if not checkTable[key] then
-					return false
-				end
-			end
+            for key, check in pairs(checkTable)do
+                local success = check(value[key])
 
-			return true
-		end
-	end
+                if success == false then
+                    return false
+                end
+            end
+            for key in pairs(value)do
+                if not checkTable[key] then
+                    return false
+                end
+            end
+
+            return true
+        end
+    end
 end
 
---[[**
-	ensure value is an Instance and it's ClassName matches the given ClassName
-
-	@param className The class name to check for
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.instanceOf(className, childTable)
-	assert(t.string(className))
+    assert(t.string(className))
 
-	local childrenCheck
-	if childTable ~= nil then
-		childrenCheck = t.children(childTable)
-	end
+    local childrenCheck
 
-	return function(value)
-		local instanceSuccess = t.Instance(value)
-		if not instanceSuccess then
-			return false
-		end
+    if childTable ~= nil then
+        childrenCheck = t.children(childTable)
+    end
 
-		if value.ClassName ~= className then
-			return false
-		end
+    return function(value)
+        local instanceSuccess = t.Instance(value)
 
-		if childrenCheck then
-			local childrenSuccess = childrenCheck(value)
-			if not childrenSuccess then
-				return false
-			end
-		end
+        if not instanceSuccess then
+            return false
+        end
+        if value.ClassName ~= className then
+            return false
+        end
+        if childrenCheck then
+            local childrenSuccess = childrenCheck(value)
 
-		return true
-	end
+            if not childrenSuccess then
+                return false
+            end
+        end
+
+        return true
+    end
 end
 
 t.instance = t.instanceOf
 
---[[**
-	ensure value is an Instance and it's ClassName matches the given ClassName by an IsA comparison
-
-	@param className The class name to check for
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.instanceIsA(className, childTable)
-	assert(t.string(className))
+    assert(t.string(className))
 
-	local childrenCheck
-	if childTable ~= nil then
-		childrenCheck = t.children(childTable)
-	end
+    local childrenCheck
 
-	return function(value)
-		local instanceSuccess = t.Instance(value)
-		if not instanceSuccess then
-			return false
-		end
+    if childTable ~= nil then
+        childrenCheck = t.children(childTable)
+    end
 
-		if not value:IsA(className) then
-			return false
-		end
+    return function(value)
+        local instanceSuccess = t.Instance(value)
 
-		if childrenCheck then
-			local childrenSuccess = childrenCheck(value)
-			if not childrenSuccess then
-				return false
-			end
-		end
+        if not instanceSuccess then
+            return false
+        end
+        if not value:IsA(className) then
+            return false
+        end
+        if childrenCheck then
+            local childrenSuccess = childrenCheck(value)
 
-		return true
-	end
+            if not childrenSuccess then
+                return false
+            end
+        end
+
+        return true
+    end
 end
-
---[[**
-	ensures value is an enum of the correct type
-
-	@param enum The enum to check
-
-	@returns A function that will return true iff the condition is passed
-**--]]
 function t.enum(enum)
-	assert(t.Enum(enum))
-	return function(value)
-		local enumItemSuccess = t.EnumItem(value)
-		if not enumItemSuccess then
-			return false
-		end
+    assert(t.Enum(enum))
 
-		if value.EnumType == enum then
-			return true
-		else
-			return false
-		end
-	end
+    return function(value)
+        local enumItemSuccess = t.EnumItem(value)
+
+        if not enumItemSuccess then
+            return false
+        end
+        if value.EnumType == enum then
+            return true
+        else
+            return false
+        end
+    end
 end
 
 do
-	local checkWrap = t.tuple(t.callback, t.callback)
+    local checkWrap = t.tuple(t.callback, t.callback)
 
---[[**
-		wraps a callback in an assert with checkArgs
+    function t.wrap(callback, checkArgs)
+        assert(checkWrap(callback, checkArgs))
 
-		@param callback The function to wrap
-		@param checkArgs The function to use to check arguments in the assert
+        return function(...)
+            assert(checkArgs(...))
 
-		@returns A function that first asserts using checkArgs and then calls callback
-	**--]]
-	function t.wrap(callback, checkArgs)
-		assert(checkWrap(callback, checkArgs))
-		return function(...)
-			assert(checkArgs(...))
-			return callback(...)
-		end
-	end
+            return callback(...)
+        end
+    end
 end
 
---[[**
-	asserts a given check
-
-	@param check The function to wrap with an assert
-
-	@returns A function that simply wraps the given check in an assert
-**--]]
 function t.strict(check)
-	return function(...)
-		assert(check(...))
-	end
+    return function(...)
+        assert(check(...))
+    end
 end
 
 do
-	local checkChildren = t.map(t.string, t.callback)
+    local checkChildren = t.map(t.string, t.callback)
 
---[[**
-		Takes a table where keys are child names and values are functions to check the children against.
-		Pass an instance tree into the function.
-		If at least one child passes each check, the overall check passes.
+    function t.children(checkTable)
+        assert(checkChildren(checkTable))
 
-		Warning! If you pass in a tree with more than one child of the same name, this function will always return false
+        return function(value)
+            local instanceSuccess = t.Instance(value)
 
-		@param checkTable The table to check against
+            if not instanceSuccess then
+                return false
+            end
 
-		@returns A function that checks an instance tree
-	**--]]
-	function t.children(checkTable)
-		assert(checkChildren(checkTable))
+            local childrenByName = {}
 
-		return function(value)
-			local instanceSuccess = t.Instance(value)
-			if not instanceSuccess then
-				return false
-			end
+            for _, child in ipairs(value:GetChildren())do
+                local name = child.Name
 
-			local childrenByName = {}
-			for _, child in ipairs(value:GetChildren()) do
-				local name = child.Name
-				if checkTable[name] then
-					if childrenByName[name] then
-						return false
-					end
+                if checkTable[name] then
+                    if childrenByName[name] then
+                        return false
+                    end
 
-					childrenByName[name] = child
-				end
-			end
+                    childrenByName[name] = child
+                end
+            end
+            for name, check in pairs(checkTable)do
+                local success = check(childrenByName[name])
 
-			for name, check in pairs(checkTable) do
-				local success = check(childrenByName[name])
-				if not success then
-					return false
-				end
-			end
+                if not success then
+                    return false
+                end
+            end
 
-			return true
-		end
-	end
+            return true
+        end
+    end
 end
 
-return { t = t }
+return{t = t}
