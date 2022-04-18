@@ -1,9 +1,7 @@
 [package]
-name = "osyrisrblx/t"
+name = "ruizukun-dev/t"
 description = "A Runtime Typechecker for Roblox"
 version = "3.0.0"
-license = "MIT"
-authors = ["Osyris"]
 realm = "shared"
 registry = "https://github.com/upliftgames/wally-index"
 exclude = ["*"]
